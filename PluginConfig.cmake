@@ -21,12 +21,12 @@ set(IFBComEventSource_DESC "Live IFBComEventSource Interface")
 set(AXVERSION_NUM "1")
 
 # NOTE: THESE GUIDS *MUST* BE UNIQUE TO YOUR PLUGIN/ACTIVEX CONTROL!  YES, ALL OF THEM!
-set(FBTYPELIB_GUID bb0dcefc-111a-54ea-856b-cbcb610282c7)
-set(IFBControl_GUID e891eefb-5a8b-55d2-80fb-1c965a95069a)
-set(FBControl_GUID 21930925-f5c4-5bfb-b38c-a1b3fd9962aa)
-set(IFBComJavascriptObject_GUID ed803098-f91d-5a53-b869-f62a4cb25144)
-set(FBComJavascriptObject_GUID 5ebd0eec-2267-58e8-ba4b-fa2943462c6f)
-set(IFBComEventSource_GUID edcf337b-5209-51e1-97d7-7c65319c77e6)
+set(FBTYPELIB_GUID 17ce287c-53d7-4432-9d5d-e0b68336068b)
+set(IFBControl_GUID 3ed22e89-11ac-43e7-9166-f09d1c434b1d)
+set(FBControl_GUID fce1b325-7a17-46f6-9825-ebdd2c749972)
+set(IFBComJavascriptObject_GUID 29229d65-8bd6-4ce2-a0c1-1bb178fe6662)
+set(FBComJavascriptObject_GUID 264fa7e0-89cd-42b7-81c3-422d5df0ca1e)
+set(IFBComEventSource_GUID 4266d14a-9d8e-494c-bafe-0d71a9bd67b5)
 
 # these are the pieces that are relevant to using it from Javascript
 set(ACTIVEX_PROGID "bittorrent.live")

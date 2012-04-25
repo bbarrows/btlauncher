@@ -22,7 +22,8 @@
 #define bufsz 2048
 #define BT_HEXCODE "4823DF041B" // BT4823DF041B0D
 #define BTLIVE_CODE "BTLive"
-#define INSTALL_REG_PATH _T("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\")
+//#define INSTALL_REG_PATH _T("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\")
+#define INSTALL_REG_PATH _T("SOFTWARE\\BitTorrentLive\\Live")
 #define MSIE_ELEVATION _T("Software\\Microsoft\\Internet Explorer\\Low Rights\\ElevationPolicy")
 #define MSIE_ELEVATION_GUID "ECC81F59-D6B1-46A4-B5E8-900FB424B95D"
 
@@ -42,6 +43,7 @@
 //#define PAIRING_DOMAIN "192.168.56.1"
 
 #define LIVE_NAME "BTLive"
+#define LIVE_REGISTRY_KEY "{17823bfb-2fd7-4fa4-8ac9-146db4f1afb0}"
 #define UTORRENT_NAME "uTorrent"
 #define BITTORRENT_NAME "BitTorrent"
 #define TORQUE_NAME "Torque"
@@ -65,16 +67,16 @@ BOOL write_elevation(const std::wstring& path, const std::wstring& name);
 btlauncherAPI::btlauncherAPI(const btlauncherPtr& plugin, const FB::BrowserHostPtr& host) : m_plugin(plugin), m_host(host)
 {
 	registerMethod("getInstallPath", make_method(this, &btlauncherAPI::getInstallPath));
-	registerMethod("getInstallVersion", make_method(this, &btlauncherAPI::getInstallVersion));
 	registerMethod("isRunning", make_method(this, &btlauncherAPI::isRunning));
 	registerMethod("stopRunning", make_method(this, &btlauncherAPI::stopRunning));
 	registerMethod("runProgram", make_method(this, &btlauncherAPI::runProgram));
-	registerMethod("checkForUpdate", make_method(this, &btlauncherAPI::checkForUpdate));
+	registerMethod("getInstallVersion", make_method(this, &btlauncherAPI::getInstallVersion));
 
 	#ifdef SHARE
 		registerMethod("downloadProgram", make_method(this, &btlauncherAPI::downloadProgram));
 		registerMethod("enablePairing", make_method(this, &btlauncherAPI::enablePairing));
 		registerMethod("ajax", make_method(this, &btlauncherAPI::ajax));
+		registerMethod("checkForUpdate", make_method(this, &btlauncherAPI::checkForUpdate));
 	#endif
 
     // Read-only property
@@ -510,6 +512,7 @@ std::wstring btlauncherAPI::getInstallVersion(const std::wstring& program) {
 		return _T(NOT_SUPPORTED_MESSAGE);
 	}
 	std::wstring reg_group = std::wstring(INSTALL_REG_PATH).append( program );
+
 	std::wstring ret = getRegStringValue( reg_group, _T("DisplayVersion"), HKEY_LOCAL_MACHINE );
 	if (ret.empty()) {
 		ret = getRegStringValue( reg_group, _T("DisplayVersion"), HKEY_CURRENT_USER );
@@ -518,7 +521,8 @@ std::wstring btlauncherAPI::getInstallVersion(const std::wstring& program) {
 }
 
 std::wstring get_install_path(const std::wstring& program) {
-	std::wstring reg_group = std::wstring(INSTALL_REG_PATH).append( program );
+	std::wstring reg_group = std::wstring(INSTALL_REG_PATH);
+
 	std::wstring ret = getRegStringValue( reg_group, _T("InstallLocation"), HKEY_LOCAL_MACHINE );
 	if (ret.empty()) {
 		ret = getRegStringValue( reg_group, _T("InstallLocation"), HKEY_CURRENT_USER );
@@ -534,11 +538,8 @@ std::wstring btlauncherAPI::getInstallPath(const std::wstring& program) {
 }
 
 std::wstring getExecutablePath(const std::wstring& program) {
-	std::wstring reg_group = std::wstring(INSTALL_REG_PATH).append( program );
-	std::wstring location = getRegStringValue( reg_group, _T("InstallLocation"), HKEY_LOCAL_MACHINE );
-	if(location.empty()) {
-		location = getRegStringValue( reg_group, _T("InstallLocation"), HKEY_CURRENT_USER ); 
-	}
+	std::wstring location = get_install_path(program);
+
 	location.append( _T("\\") );
 	location.append( program );
 	location.append( _T(".exe") );
@@ -564,7 +565,9 @@ BOOL launch_program(const std::wstring& program, const std::wstring& switches) {
 	// pops up a security dialog in IE
 
 	// try to write to IE security dialog...
+#ifdef SHARE
 	BOOL result = write_elevation(get_install_path(program), _T("SoShare.exe"));
+#endif
 
 	std::wstring installcommand = getExecutablePath(program).c_str();
 	if (switches.length() > 0) {
